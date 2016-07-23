@@ -49,8 +49,8 @@ void assembleData(){
 	unsigned long int  counter = 0;
 	dataOut.close();
 	dataOut.clear();
-	cout << "Preparing to format the incoming data to desired output";
-	cout << totalBytesWritten << "\n\n";
+	cout << "Preparing to format the incoming data to desired output ( ";
+	cout << totalBytesWritten << " Bytes) \n\n";
 	dataOut.open("dataOut.txt", ios::in|ios::binary);
 	dataOut.seekg(0);
 	
@@ -89,13 +89,13 @@ void assembleData(){
 // application reads from the specified serial port and reports the collected data
 int main(int argc, _TCHAR* argv[])
 {
-	printf("Welcome to the serial test app!\n\n");
+	printf("Welcome to the ECG_PPG-DataLogger app!\n\n");
 	char* FileName = "ECG.txt";
 	signal(SIGINT, signalHandler);
 	ECGout.open("ECG.txt",ios::out);
 	PPGout.open("PPG.txt",  ios::out);
 	dataOut.open("dataOut.txt",  ios::out|ios::binary);
-	cout << "Enter the COM port from which the data is to saved";
+	cout << "Enter the COM port from which the data is to saved  ";
 	string input,name="\\\\.\\";
 	cin >> input;
 	name += input;
@@ -103,8 +103,7 @@ int main(int argc, _TCHAR* argv[])
 	char portname[20];
 	strcpy_s(portname,name.c_str());
 	portname[name.length()] = '\0';
-	cout << portname;
-	Sleep(5000);
+	cout << portname <<" Starting ... ";
 	Serial* SP = new Serial(portname);    // adjust as needed
 
 	if (SP->IsConnected())
@@ -115,7 +114,7 @@ int main(int argc, _TCHAR* argv[])
 	int dataLength = 200;
 	int readResult = 0;
 	
-	while (1){
+	while (SP->IsConnected()){
 		if ((SP->IsConnected())){
 			while (isRun){
 				readResult = SP->ReadData(incomingData, dataLength);
@@ -138,6 +137,7 @@ int main(int argc, _TCHAR* argv[])
 			switch (input){
 			case 'S':
 				isRun = 1;
+				cout << "Press Ctrl+C to pause the Acquisition ";
 				break;
 
 			case 'P':
@@ -153,5 +153,6 @@ int main(int argc, _TCHAR* argv[])
 			}
 		}
 	}
+	system("pause");
 	return 0;
 }
