@@ -11,7 +11,8 @@ using namespace std;
 fstream ECGout, PPGout, dataOut;
 int isRun = 0;
 unsigned long int totalBytesWritten = 0;
-
+#define DELIMITER 'U'
+#define SEPARATOR 0xAA
 void closeAll(){
 	dataOut.close();
 	ECGout.close();
@@ -54,7 +55,7 @@ void assembleData(){
 	dataOut.open("dataOut.txt", ios::in|ios::binary);
 	dataOut.seekg(0);
 	
-	while (temp!='\n'){
+	while (temp != DELIMITER){
 		dataOut.read(&temp, 1);//readonly 1 byte 
 	}
 	//now we are aligned to the first '\n' character
@@ -62,7 +63,7 @@ void assembleData(){
 	while (!dataOut.eof()){
 		counter++;
   		dataOut.read((char*)buffer, 6);//read 6 bytes at a time hoping that the 6th will always be \n
-		if (buffer[5] == '\n'){
+		if (buffer[5] == DELIMITER){
 			efficiency++;
 			//valid chunk of data use it
 			int ECGval = signedConvert(buffer[0], buffer[1]);
@@ -77,7 +78,7 @@ void assembleData(){
 		else{
 			temp = 'q';
 			//re-Sync
-			while (temp != '\n'){
+			while (temp != DELIMITER){
 				dataOut.read(&temp, 1);//readonly 1 byte 
 			}
 		}
